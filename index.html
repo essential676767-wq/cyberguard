@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberGuard — Защита вашего бизнеса</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #050505; color: #ffffff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .neon-text { text-shadow: 0 0 20px rgba(16, 185, 129, 0.6); }
+        .neon-button { background: linear-gradient(90deg, #10b981, #3b82f6); transition: all 0.3s ease; }
+        .neon-button:hover { box-shadow: 0 0 30px rgba(16, 185, 129, 0.5); transform: translateY(-3px) scale(1.02); }
+        .glow-bg { position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, rgba(16,185,129,0.15) 0%, rgba(0,0,0,0) 70%); top: -200px; left: -200px; z-index: -1; }
+        .glow-bg-2 { position: absolute; width: 500px; height: 500px; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(0,0,0,0) 70%); bottom: 0; right: -200px; z-index: -1; }
+        
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
+        .float-anim { animation: float 6s ease-in-out infinite; }
+        
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; opacity: 0; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <div class="glow-bg"></div>
+    <div class="glow-bg-2"></div>
+
+    <nav class="fixed top-0 w-full glass p-5 flex justify-between items-center z-50 border-b border-white/5">
+        <div class="flex items-center gap-3">
+            <span class="text-3xl">🛡️</span>
+            <div class="text-2xl font-extrabold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">
+                CyberGuard
+            </div>
+        </div>
+        <div class="hidden md:flex gap-8 text-sm font-medium text-gray-400">
+            <a href="#services" class="hover:text-white transition">Услуги</a>
+            <a href="#pricing" class="hover:text-white transition">Цены</a>
+            <a href="#faq" class="hover:text-white transition">FAQ</a>
+        </div>
+        <div class="flex gap-4">
+            <a href="/login" class="text-gray-300 hover:text-white font-medium py-2">Войти</a>
+            <a href="#pricing" class="neon-button px-6 py-2.5 rounded-full text-white font-bold text-sm shadow-lg">Заказать</a>
+        </div>
+    </nav>
+
+    <main class="flex-1 flex flex-col items-center justify-center pt-40 pb-20 px-4 relative z-10">
+        <div class="text-center max-w-5xl">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-emerald-400 text-sm font-semibold mb-8 animate-fade-in-up">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                Работаем по всей России
+            </div>
+            
+            <h1 class="text-6xl md:text-8xl font-extrabold leading-[1.1] mb-8 animate-fade-in-up" style="animation-delay: 0.1s;">
+                Ваш сайт <br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500 neon-text">под защитой</span>
+            </h1>
+            
+            <p class="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto animate-fade-in-up" style="animation-delay: 0.2s;">
+                Найдем уязвимости, которые могут стоить вам миллионов. Исправим их. Обеспечим безопасность вашего бизнеса и данных клиентов.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up" style="animation-delay: 0.3s;">
+                <a href="#pricing" class="neon-button px-10 py-4 rounded-full text-white font-extrabold text-lg shadow-xl">
+                    Заказать аудит за 5000 ₽
+                </a>
+                <a href="#services" class="glass px-10 py-4 rounded-full text-white font-bold text-lg hover:bg-white/10 transition">
+                    Узнать больше
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-24 grid grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-4xl animate-fade-in-up" style="animation-delay: 0.4s;">
+            <div class="glass p-6 rounded-2xl text-center float-anim" style="animation-delay: 0s;">
+                <div class="text-3xl font-extrabold text-white mb-1">150+</div>
+                <div class="text-xs text-gray-400 uppercase tracking-wider">Сайтов проверено</div>
+            </div>
+            <div class="glass p-6 rounded-2xl text-center float-anim" style="animation-delay: 1s;">
+                <div class="text-3xl font-extrabold text-white mb-1">24/7</div>
+                <div class="text-xs text-gray-400 uppercase tracking-wider">Мониторинг угроз</div>
+            </div>
+            <div class="glass p-6 rounded-2xl text-center float-anim" style="animation-delay: 2s;">
+                <div class="text-3xl font-extrabold text-white mb-1">152-ФЗ</div>
+                <div class="text-xs text-gray-400 uppercase tracking-wider">Соответствие</div>
+            </div>
+            <div class="glass p-6 rounded-2xl text-center float-anim" style="animation-delay: 3s;">
+                <div class="text-3xl font-extrabold text-white mb-1">0</div>
+                <div class="text-xs text-gray-400 uppercase tracking-wider">Взломов у клиентов</div>
+            </div>
+        </div>
+    </main>
+
+    <section id="services" class="py-24 px-4 max-w-6xl mx-auto w-full relative z-10">
+        <h2 class="text-4xl font-extrabold text-center mb-4">Что мы делаем</h2>
+        <p class="text-gray-400 text-center mb-16 max-w-2xl mx-auto">Мы не просто находим ошибки. Мы предоставляем полный цикл защиты вашего веб-ресурса от взлома и штрафов.</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="glass p-8 rounded-3xl hover:border-emerald-500/50 transition duration-300 group">
+                <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition">🔍</div>
+                <h3 class="text-2xl font-bold mb-3">Аудит безопасности</h3>
+                <p class="text-gray-400 mb-6 leading-relaxed">Полное сканирование сайта на наличие SQL-инъекций, XSS, открытых админок и утечек данных.</p>
+            </div>
+            <div class="glass p-8 rounded-3xl hover:border-blue-500/50 transition duration-300 group border-t-2 border-t-blue-500">
+                <div class="w-14 h-14 rounded-2xl bg-blue-500/20 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition">🛠️</div>
+                <h3 class="text-2xl font-bold mb-3">Исправление ошибок</h3>
+                <p class="text-gray-400 mb-6 leading-relaxed">Мы не просто показываем проблемы. Мы их решаем. Настраиваем защиту, правим код, закрываем доступы.</p>
+            </div>
+            <div class="glass p-8 rounded-3xl hover:border-purple-500/50 transition duration-300 group">
+                <div class="w-14 h-14 rounded-2xl bg-purple-500/20 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition">📋</div>
+                <h3 class="text-2xl font-bold mb-3">Соответствие 152-ФЗ</h3>
+                <p class="text-gray-400 mb-6 leading-relaxed">Приведем ваш сайт в порядок перед проверками Роскомнадзора. Избежите штрафов до 15 млн рублей.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing" class="py-24 px-4 max-w-5xl mx-auto w-full relative z-10">
+        <h2 class="text-4xl font-extrabold text-center mb-16">Простые и честные тарифы</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="glass p-8 rounded-3xl flex flex-col">
+                <h3 class="text-xl font-bold mb-2">Аудит</h3>
+                <p class="text-gray-400 text-sm mb-6">Только поиск проблем</p>
+                <div class="text-4xl font-extrabold mb-6">5 000 ₽</div>
+                <ul class="text-sm text-gray-300 space-y-3 mb-8 flex-1">
+                    <li>✅ Сканирование сайта</li>
+                    <li>✅ Отчет в PDF</li>
+                    <li>✅ Список уязвимостей</li>
+                </ul>
+                <a href="/register" class="block text-center w-full bg-white/10 py-3 rounded-xl hover:bg-white/20 transition font-bold">Заказать</a>
+            </div>
+
+            <div class="glass p-8 rounded-3xl flex flex-col border-2 border-emerald-500 relative transform md:-translate-y-4 shadow-[0_0_40px_rgba(16,185,129,0.2)]">
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-emerald-500 text-black px-4 py-1 rounded-full text-xs font-extrabold tracking-wider">РЕКОМЕНДУЕМ</div>
+                <h3 class="text-xl font-bold mb-2">Аудит + Исправление</h3>
+                <p class="text-gray-400 text-sm mb-6">Полное решение под ключ</p>
+                <div class="text-4xl font-extrabold mb-6 text-emerald-400">15 000 ₽</div>
+                <ul class="text-sm text-gray-300 space-y-3 mb-8 flex-1">
+                    <li>✅ Всё из тарифа "Аудит"</li>
+                    <li>✅ Исправление всех ошибок</li>
+                    <li>✅ Настройка защиты</li>
+                    <li>✅ Проверка через 7 дней</li>
+                </ul>
+                <a href="/register" class="block text-center w-full neon-button py-3 rounded-xl text-white font-bold">Заказать</a>
+            </div>
+
+            <div class="glass p-8 rounded-3xl flex flex-col">
+                <h3 class="text-xl font-bold mb-2">Под защитой</h3>
+                <p class="text-gray-400 text-sm mb-6">Ежемесячное обслуживание</p>
+                <div class="text-4xl font-extrabold mb-6">5 000 ₽<span class="text-lg text-gray-500 font-normal">/мес</span></div>
+                <ul class="text-sm text-gray-300 space-y-3 mb-8 flex-1">
+                    <li>✅ Мониторинг 24/7</li>
+                    <li>✅ Оперативное исправление</li>
+                    <li>✅ Консультации</li>
+                </ul>
+                <a href="/register" class="block text-center w-full bg-white/10 py-3 rounded-xl hover:bg-white/20 transition font-bold">Подписаться</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-24 px-4 max-w-3xl mx-auto w-full relative z-10">
+        <h2 class="text-4xl font-extrabold text-center mb-10">Частые вопросы</h2>
+        <div class="space-y-4">
+            <div class="glass p-6 rounded-2xl">
+                <h4 class="text-lg font-bold mb-2">Это легально?</h4>
+                <p class="text-gray-400 text-sm">Да. Мы проводим аудит только с письменного согласия владельца сайта. Мы не ломаем чужие ресурсы, а ищем уязвимости, чтобы их закрыть.</p>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <h4 class="text-lg font-bold mb-2">Что я получу после оплаты?</h4>
+                <p class="text-gray-400 text-sm">Вы получите доступ в личный кабинет, где будет создан заказ. После проверки сайта вы получите подробный PDF-отчет со списком уязвимостей и способами их устранения.</p>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <h4 class="text-lg font-bold mb-2">Вы гарантируете, что мой сайт не взломают?</h4>
+                <p class="text-gray-400 text-sm">Мы гарантируем, что найдем и закроем известные уязвимости, которые могут привести к взлому. Это значительно повышает безопасность, но 100% гарантию от всех хакеров в мире не даст никто.</p>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <h4 class="text-lg font-bold mb-2">Как быстро вы работаете?</h4>
+                <p class="text-gray-400 text-sm">Аудит занимает до 24 часов. Исправление ошибок (если вы заказали полный тариф) — до 3 рабочих дней, в зависимости от сложности сайта.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="border-t border-white/10 py-10 text-center relative z-10">
+        <div class="flex justify-center items-center gap-2 mb-4">
+            <span class="text-2xl">🛡️</span>
+            <span class="text-xl font-bold">CyberGuard</span>
+        </div>
+        <p class="text-gray-500 text-sm">© 2026 CyberGuard. Защита вашего бизнеса.</p>
+    </footer>
+
+</body>
+</html>
