@@ -5,14 +5,12 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
-import os, hashlib
+import os, hashlib, random
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from database import SessionLocal, User, Message, Order
 
-# АБСОЛЮТНЫЙ ПУТЬ К ПАПКЕ ПРОЕКТА
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY", "fallback_secret_key")
@@ -20,8 +18,6 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 
 app = FastAPI()
-
-# Создаем папку для аватарок, если ее нет
 os.makedirs(os.path.join(BASE_DIR, "static", "avatars"), exist_ok=True)
 
 def get_db():
@@ -65,20 +61,41 @@ def create_access_token(data: dict):
 def register(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     if db.query(User).filter(User.email == form_data.username).first():
         raise HTTPException(status_code=400, detail="Email занят")
+    
+    code = str(random.randint(100000, 999999))
+    
     new_user = User(
         email=form_data.username, 
         hashed_password=get_password_hash(form_data.password), 
-        is_active=True
+        is_active=False,
+        confirmation_token=code
     )
     db.add(new_user)
     db.commit()
-    return {"message": "OK"}
+    
+    # Возвращаем код прямо в ответе, чтобы сайт его показал
+    return {"message": "Код отправлен", "code": code}
+
+@app.post("/api/verify_code")
+def verify_code(email: str, code: str, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+    if user.confirmation_token != code:
+        raise HTTPException(status_code=400, detail="Неверный код")
+    
+    user.is_active = True
+    user.confirmation_token = None
+    db.commit()
+    return {"message": "Почта подтверждена! Теперь войдите."}
 
 @app.post("/token")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == form_data.username).first()
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Неверный логин или пароль")
+    if not user.is_active:
+        raise HTTPException(status_code=403, detail="Подтвердите почту.")
     return {"access_token": create_access_token(data={"sub": user.email}), "token_type": "bearer"}
 
 @app.get("/api/me")
@@ -158,26 +175,20 @@ def admin_reply(data: dict, user: User = Depends(get_current_user), db: Session 
     db.commit()
     return {"status": "ok"}
 
-# --- РАЗДАЧА ФАЙЛОВ (С АБСОЛЮТНЫМИ ПУТЯМИ) ---
+# --- РАЗДАЧА ФАЙЛОВ ---
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
 
 @app.get("/")
 def read_index(): return FileResponse(os.path.join(BASE_DIR, "static", "index.html"))
-
 @app.get("/login")
 def read_login(): return FileResponse(os.path.join(BASE_DIR, "static", "login.html"))
-
 @app.get("/register")
 def read_register(): return FileResponse(os.path.join(BASE_DIR, "static", "register.html"))
-
 @app.get("/dashboard")
 def read_dashboard(): return FileResponse(os.path.join(BASE_DIR, "static", "dashboard.html"))
-
 @app.get("/admin")
 def read_admin(): return FileResponse(os.path.join(BASE_DIR, "static", "admin.html"))
-
 @app.get("/privacy")
 def read_privacy(): return FileResponse(os.path.join(BASE_DIR, "static", "privacy.html"))
-
 @app.get("/terms")
 def read_terms(): return FileResponse(os.path.join(BASE_DIR, "static", "terms.html"))
