@@ -5,9 +5,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
-import os, hashlib, random, smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import os, hashlib, random
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from database import SessionLocal, User, Message, Order
@@ -59,38 +57,12 @@ def create_access_token(data: dict):
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-def send_email(to_email: str, code: str):
-    try:
-        smtp_server = os.getenv("SMTP_SERVER")
-        smtp_port = int(os.getenv("SMTP_PORT", 465))
-        smtp_user = os.getenv("SMTP_USER")
-        smtp_password = os.getenv("SMTP_PASSWORD")
-
-        if not smtp_user or not smtp_password:
-            print("SMTP не настроен")
-            return
-
-        msg = MIMEMultipart()
-        msg['From'] = smtp_user
-        msg['To'] = to_email
-        msg['Subject'] = "Код подтверждения CyberGuard"
-        body = f"Ваш код: {code}"
-        msg.attach(MIMEText(body, 'plain'))
-
-        # Используем SMTP_SSL для порта 465
-        server = smtplib.SMTP_SSL(smtp_server, smtp_port)
-        server.login(smtp_user, smtp_password)
-        server.send_message(msg)
-        server.quit()
-        print(f"Письмо отправлено на {to_email}")
-    except Exception as e:
-        print(f"Ошибка отправки: {e}")
-
 @app.post("/register")
 def register(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     if db.query(User).filter(User.email == form_data.username).first():
         raise HTTPException(status_code=400, detail="Email занят")
     
+    # Генерируем код, но НЕ отправляем на почту. Сразу отдаем на сайт.
     code = str(random.randint(100000, 999999))
     
     new_user = User(
@@ -102,10 +74,7 @@ def register(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Dep
     db.add(new_user)
     db.commit()
     
-    send_email(form_data.username, code)
-    
-    # Возвращаем код на сайт (на случай, если почта не дойдет)
-    return {"message": "Код отправлен", "code": code}
+    return {"message": "Код сгенерирован", "code": code}
 
 @app.post("/api/verify_code")
 def verify_code(email: str, code: str, db: Session = Depends(get_db)):
