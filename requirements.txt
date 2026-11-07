@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+sqlalchemy
+python-jose[cryptography]
+python-multipart
+passlib
+python-dotenv
+aiogram
+httpx
