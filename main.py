@@ -1,11 +1,11 @@
-from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi import FastAPI, Depends, HTTPException, Request, UploadFile, File
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
-import os, hashlib, random
+import os, hashlib, random, shutil
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from database import SessionLocal, User, Message, Order
@@ -19,6 +19,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 
 app = FastAPI()
 os.makedirs(os.path.join(BASE_DIR, "static", "avatars"), exist_ok=True)
+os.makedirs(os.path.join(BASE_DIR, "static", "uploads"), exist_ok=True)
 
 def get_db():
     db = SessionLocal()
@@ -62,7 +63,6 @@ def register(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Dep
     if db.query(User).filter(User.email == form_data.username).first():
         raise HTTPException(status_code=400, detail="Email занят")
     
-    # Генерируем код, но НЕ отправляем на почту. Сразу отдаем на сайт.
     code = str(random.randint(100000, 999999))
     
     new_user = User(
@@ -136,6 +136,18 @@ def confirm_payment(order_id: int, user: User = Depends(get_current_user), db: S
         order.status = "paid"
         db.commit()
     return {"status": "ok"}
+
+# --- ЗАГРУЗКА ФАЙЛОВ ---
+@app.post("/api/upload_file")
+async def upload_file(file: UploadFile = File(...), user: User = Depends(get_current_user)):
+    user_dir = os.path.join(BASE_DIR, "static", "uploads", str(user.id))
+    os.makedirs(user_dir, exist_ok=True)
+    
+    file_path = os.path.join(user_dir, file.filename)
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    
+    return {"message": "Файл загружен", "filename": file.filename}
 
 # --- ЧАТ ---
 class ChatMessage(BaseModel):
