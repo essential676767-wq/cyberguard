@@ -3,192 +3,377 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberGuard — Защита вашего бизнеса</title>
+    <title>CyberGuard — Защита бизнеса</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #050505; color: #ffffff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .neon-text { text-shadow: 0 0 20px rgba(16, 185, 129, 0.6); }
-        .neon-button { background: linear-gradient(90deg, #10b981, #3b82f6); transition: all 0.3s ease; }
-        .neon-button:hover { box-shadow: 0 0 30px rgba(16, 185, 129, 0.5); transform: translateY(-3px) scale(1.02); }
-        .glow-bg { position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, rgba(16,185,129,0.15) 0%, rgba(0,0,0,0) 70%); top: -200px; left: -200px; z-index: -1; }
-        .glow-bg-2 { position: absolute; width: 500px; height: 500px; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(0,0,0,0) 70%); bottom: 0; right: -200px; z-index: -1; }
-        
-        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
-        .float-anim { animation: float 6s ease-in-out infinite; }
-        
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; opacity: 0; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .btn-primary { background-color: #1e3a8a; color: white; transition: background 0.2s; }
+        .btn-primary:hover { background-color: #1e40af; }
+        .card { background: white; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="antialiased">
 
-    <div class="glow-bg"></div>
-    <div class="glow-bg-2"></div>
+    <!-- Навигация -->
+    <nav class="bg-white border-b border-gray-200 fixed top-0 w-full z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl">🛡️</span>
+                    <span class="text-2xl font-bold text-slate-900 tracking-tight">CyberGuard</span>
+                </div>
+                
+                <!-- Меню для авторизованных -->
+                <div id="auth-menu" class="hidden flex items-center gap-4">
+                    <span class="text-sm font-medium text-slate-600">Вы вошли как: <span id="user-email" class="font-bold"></span></span>
+                    <button onclick="logout()" class="text-red-600 font-medium text-sm hover:text-red-800">Выйти</button>
+                </div>
 
-    <nav class="fixed top-0 w-full glass p-5 flex justify-between items-center z-50 border-b border-white/5">
-        <div class="flex items-center gap-3">
-            <span class="text-3xl">🛡️</span>
-            <div class="text-2xl font-extrabold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">
-                CyberGuard
+                <!-- Меню для гостей -->
+                <div id="guest-menu" class="flex items-center gap-4">
+                    <button onclick="showSection('auth')" class="text-sm font-medium text-slate-600 hover:text-blue-800">Войти</button>
+                    <button onclick="showSection('services')" class="btn-primary px-5 py-2.5 rounded-md text-sm font-semibold">Заказать аудит</button>
+                </div>
             </div>
-        </div>
-        <div class="hidden md:flex gap-8 text-sm font-medium text-gray-400">
-            <a href="#services" class="hover:text-white transition">Услуги</a>
-            <a href="#pricing" class="hover:text-white transition">Цены</a>
-            <a href="#faq" class="hover:text-white transition">FAQ</a>
-        </div>
-        <div class="flex gap-4">
-            <a href="/login" class="text-gray-300 hover:text-white font-medium py-2">Войти</a>
-            <a href="#pricing" class="neon-button px-6 py-2.5 rounded-full text-white font-bold text-sm shadow-lg">Заказать</a>
         </div>
     </nav>
 
-    <main class="flex-1 flex flex-col items-center justify-center pt-40 pb-20 px-4 relative z-10">
-        <div class="text-center max-w-5xl">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-emerald-400 text-sm font-semibold mb-8 animate-fade-in-up">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                Работаем по всей России
+    <!-- СЕКЦИЯ 1: ЛЕНДИНГ (Главная) -->
+    <main id="section-landing" class="pt-32 pb-20 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-800 text-xs font-semibold mb-6">
+                <span class="w-2 h-2 rounded-full bg-blue-600"></span> Работаем по всей России
             </div>
-            
-            <h1 class="text-6xl md:text-8xl font-extrabold leading-[1.1] mb-8 animate-fade-in-up" style="animation-delay: 0.1s;">
-                Ваш сайт <br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500 neon-text">под защитой</span>
+            <h1 class="text-5xl md:text-6xl font-bold leading-tight mb-6 text-slate-900">
+                Безопасность вашего сайта — <br class="hidden md:block"> наша ответственность
             </h1>
-            
-            <p class="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto animate-fade-in-up" style="animation-delay: 0.2s;">
-                Найдем уязвимости, которые могут стоить вам миллионов. Исправим их. Обеспечим безопасность вашего бизнеса и данных клиентов.
+            <p class="text-lg text-slate-600 mb-10 max-w-2xl mx-auto">
+                Проводим профессиональный аудит безопасности, находим уязвимости и исправляем их. Защищаем ваш бизнес от штрафов и взломов.
             </p>
-
-            <div class="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up" style="animation-delay: 0.3s;">
-                <a href="#pricing" class="neon-button px-10 py-4 rounded-full text-white font-extrabold text-lg shadow-xl">
-                    Заказать аудит за 5000 ₽
-                </a>
-                <a href="#services" class="glass px-10 py-4 rounded-full text-white font-bold text-lg hover:bg-white/10 transition">
-                    Узнать больше
-                </a>
-            </div>
-        </div>
-
-        <div class="mt-24 grid grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-4xl animate-fade-in-up" style="animation-delay: 0.4s;">
-            <div class="glass p-6 rounded-2xl text-center float-anim" style="animation-delay: 0s;">
-                <div class="text-3xl font-extrabold text-white mb-1">150+</div>
-                <div class="text-xs text-gray-400 uppercase tracking-wider">Сайтов проверено</div>
-            </div>
-            <div class="glass p-6 rounded-2xl text-center float-anim" style="animation-delay: 1s;">
-                <div class="text-3xl font-extrabold text-white mb-1">24/7</div>
-                <div class="text-xs text-gray-400 uppercase tracking-wider">Мониторинг угроз</div>
-            </div>
-            <div class="glass p-6 rounded-2xl text-center float-anim" style="animation-delay: 2s;">
-                <div class="text-3xl font-extrabold text-white mb-1">152-ФЗ</div>
-                <div class="text-xs text-gray-400 uppercase tracking-wider">Соответствие</div>
-            </div>
-            <div class="glass p-6 rounded-2xl text-center float-anim" style="animation-delay: 3s;">
-                <div class="text-3xl font-extrabold text-white mb-1">0</div>
-                <div class="text-xs text-gray-400 uppercase tracking-wider">Взломов у клиентов</div>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="showSection('services')" class="btn-primary px-8 py-3.5 rounded-md text-lg font-semibold">Заказать аудит</button>
+                <button onclick="showSection('about')" class="bg-white border border-gray-300 text-slate-700 px-8 py-3.5 rounded-md text-lg font-semibold hover:bg-gray-50">Подробнее</button>
             </div>
         </div>
     </main>
 
-    <section id="services" class="py-24 px-4 max-w-6xl mx-auto w-full relative z-10">
-        <h2 class="text-4xl font-extrabold text-center mb-4">Что мы делаем</h2>
-        <p class="text-gray-400 text-center mb-16 max-w-2xl mx-auto">Мы не просто находим ошибки. Мы предоставляем полный цикл защиты вашего веб-ресурса от взлома и штрафов.</p>
-        
+    <!-- СЕКЦИЯ 2: УСЛУГИ И ТАРИФЫ -->
+    <section id="section-services" class="hidden pt-32 pb-20 px-4 max-w-7xl mx-auto">
+        <h2 class="text-3xl font-bold text-center text-slate-900 mb-12">Наши тарифы</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="glass p-8 rounded-3xl hover:border-emerald-500/50 transition duration-300 group">
-                <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition">🔍</div>
-                <h3 class="text-2xl font-bold mb-3">Аудит безопасности</h3>
-                <p class="text-gray-400 mb-6 leading-relaxed">Полное сканирование сайта на наличие SQL-инъекций, XSS, открытых админок и утечек данных.</p>
+            <!-- Тариф 1 -->
+            <div class="card p-8 rounded-xl flex flex-col">
+                <h3 class="text-xl font-bold text-slate-900 mb-1">Аудит</h3>
+                <p class="text-slate-500 text-sm mb-6">Только поиск проблем</p>
+                <div class="text-4xl font-bold text-slate-900 mb-6">5 000 ₽</div>
+                <ul class="text-sm text-slate-600 space-y-3 mb-8 flex-1">
+                    <li class="flex items-center gap-2">✓ Сканирование сайта</li>
+                    <li class="flex items-center gap-2">✓ Отчет в PDF</li>
+                    <li class="flex items-center gap-2">✓ Список уязвимостей</li>
+                </ul>
+                <button onclick="startOrder('Аудит', 5000)" class="block text-center w-full btn-primary py-3 rounded-md font-semibold text-white">Заказать</button>
             </div>
-            <div class="glass p-8 rounded-3xl hover:border-blue-500/50 transition duration-300 group border-t-2 border-t-blue-500">
-                <div class="w-14 h-14 rounded-2xl bg-blue-500/20 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition">🛠️</div>
-                <h3 class="text-2xl font-bold mb-3">Исправление ошибок</h3>
-                <p class="text-gray-400 mb-6 leading-relaxed">Мы не просто показываем проблемы. Мы их решаем. Настраиваем защиту, правим код, закрываем доступы.</p>
+            <!-- Тариф 2 -->
+            <div class="card p-8 rounded-xl flex flex-col border-2 border-blue-800 relative shadow-lg">
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-800 text-white px-4 py-1 rounded-full text-xs font-bold tracking-wider">РЕКОМЕНДУЕМ</div>
+                <h3 class="text-xl font-bold text-slate-900 mb-1">Аудит + Исправление</h3>
+                <p class="text-slate-500 text-sm mb-6">Полное решение под ключ</p>
+                <div class="text-4xl font-bold text-slate-900 mb-6">15 000 ₽</div>
+                <ul class="text-sm text-slate-600 space-y-3 mb-8 flex-1">
+                    <li class="flex items-center gap-2">✓ Всё из тарифа "Аудит"</li>
+                    <li class="flex items-center gap-2">✓ Исправление ошибок</li>
+                    <li class="flex items-center gap-2">✓ Настройка защиты</li>
+                </ul>
+                <button onclick="startOrder('Аудит + Исправление', 15000)" class="block text-center w-full btn-primary py-3 rounded-md font-semibold text-white">Заказать</button>
             </div>
-            <div class="glass p-8 rounded-3xl hover:border-purple-500/50 transition duration-300 group">
-                <div class="w-14 h-14 rounded-2xl bg-purple-500/20 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition">📋</div>
-                <h3 class="text-2xl font-bold mb-3">Соответствие 152-ФЗ</h3>
-                <p class="text-gray-400 mb-6 leading-relaxed">Приведем ваш сайт в порядок перед проверками Роскомнадзора. Избежите штрафов до 15 млн рублей.</p>
+            <!-- Тариф 3 -->
+            <div class="card p-8 rounded-xl flex flex-col">
+                <h3 class="text-xl font-bold text-slate-900 mb-1">Под защитой</h3>
+                <p class="text-slate-500 text-sm mb-6">Ежемесячное обслуживание</p>
+                <div class="text-4xl font-bold text-slate-900 mb-6">5 000 ₽<span class="text-lg text-slate-500 font-normal">/мес</span></div>
+                <ul class="text-sm text-slate-600 space-y-3 mb-8 flex-1">
+                    <li class="flex items-center gap-2">✓ Мониторинг 24/7</li>
+                    <li class="flex items-center gap-2">✓ Оперативное исправление</li>
+                    <li class="flex items-center gap-2">✓ Консультации</li>
+                </ul>
+                <button onclick="startOrder('Под защитой', 5000)" class="block text-center w-full bg-slate-100 py-3 rounded-md hover:bg-slate-200 transition font-semibold text-slate-800">Заказать</button>
             </div>
         </div>
     </section>
 
-    <section id="pricing" class="py-24 px-4 max-w-5xl mx-auto w-full relative z-10">
-        <h2 class="text-4xl font-extrabold text-center mb-16">Простые и честные тарифы</h2>
+    <!-- СЕКЦИЯ 3: АВТОРИЗАЦИЯ / РЕГИСТРАЦИЯ -->
+    <section id="section-auth" class="hidden pt-32 pb-20 px-4">
+        <div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-md border border-gray-200">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6 text-center" id="auth-title">Вход</h2>
+            
+            <form id="auth-form" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                    <input type="email" id="auth-email" required class="w-full bg-slate-50 border border-gray-300 rounded-md px-4 py-2.5 text-slate-900 focus:outline-none focus:border-blue-800">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Пароль</label>
+                    <input type="password" id="auth-password" required class="w-full bg-slate-50 border border-gray-300 rounded-md px-4 py-2.5 text-slate-900 focus:outline-none focus:border-blue-800">
+                </div>
+                
+                <!-- Галочка согласия (только при регистрации) -->
+                <div id="terms-checkbox" class="hidden flex items-start">
+                    <input id="terms" type="checkbox" required class="mt-1 h-4 w-4 text-blue-800 border-gray-300 rounded">
+                    <label for="terms" class="ml-2 text-sm text-slate-700">
+                        Я согласен с <a href="/offer" target="_blank" class="text-blue-800 hover:underline">офертой</a>, <a href="/terms" target="_blank" class="text-blue-800 hover:underline">условиями</a> и <a href="/privacy" target="_blank" class="text-blue-800 hover:underline">политикой</a>.
+                    </label>
+                </div>
+
+                <button type="submit" id="auth-btn" class="w-full btn-primary py-3 rounded-md font-semibold text-white">Войти</button>
+            </form>
+            
+            <p class="text-center text-slate-500 mt-6 text-sm">
+                <span id="auth-switch-text">Нет аккаунта?</span> 
+                <button onclick="switchAuthMode()" class="text-blue-800 font-medium hover:underline" id="auth-switch-btn">Зарегистрироваться</button>
+            </p>
+        </div>
+    </section>
+
+    <!-- СЕКЦИЯ 4: ЛИЧНЫЙ КАБИНЕТ (Заказы) -->
+    <section id="section-dashboard" class="hidden pt-32 pb-20 px-4 max-w-4xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-3xl font-bold text-slate-900">Мои заказы</h2>
+            <button onclick="showSection('services')" class="text-sm font-medium text-blue-800 hover:underline">+ Новый заказ</button>
+        </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="glass p-8 rounded-3xl flex flex-col">
-                <h3 class="text-xl font-bold mb-2">Аудит</h3>
-                <p class="text-gray-400 text-sm mb-6">Только поиск проблем</p>
-                <div class="text-4xl font-extrabold mb-6">5 000 ₽</div>
-                <ul class="text-sm text-gray-300 space-y-3 mb-8 flex-1">
-                    <li>✅ Сканирование сайта</li>
-                    <li>✅ Отчет в PDF</li>
-                    <li>✅ Список уязвимостей</li>
-                </ul>
-                <a href="/register" class="block text-center w-full bg-white/10 py-3 rounded-xl hover:bg-white/20 transition font-bold">Заказать</a>
-            </div>
-
-            <div class="glass p-8 rounded-3xl flex flex-col border-2 border-emerald-500 relative transform md:-translate-y-4 shadow-[0_0_40px_rgba(16,185,129,0.2)]">
-                <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-emerald-500 text-black px-4 py-1 rounded-full text-xs font-extrabold tracking-wider">РЕКОМЕНДУЕМ</div>
-                <h3 class="text-xl font-bold mb-2">Аудит + Исправление</h3>
-                <p class="text-gray-400 text-sm mb-6">Полное решение под ключ</p>
-                <div class="text-4xl font-extrabold mb-6 text-emerald-400">15 000 ₽</div>
-                <ul class="text-sm text-gray-300 space-y-3 mb-8 flex-1">
-                    <li>✅ Всё из тарифа "Аудит"</li>
-                    <li>✅ Исправление всех ошибок</li>
-                    <li>✅ Настройка защиты</li>
-                    <li>✅ Проверка через 7 дней</li>
-                </ul>
-                <a href="/register" class="block text-center w-full neon-button py-3 rounded-xl text-white font-bold">Заказать</a>
-            </div>
-
-            <div class="glass p-8 rounded-3xl flex flex-col">
-                <h3 class="text-xl font-bold mb-2">Под защитой</h3>
-                <p class="text-gray-400 text-sm mb-6">Ежемесячное обслуживание</p>
-                <div class="text-4xl font-extrabold mb-6">5 000 ₽<span class="text-lg text-gray-500 font-normal">/мес</span></div>
-                <ul class="text-sm text-gray-300 space-y-3 mb-8 flex-1">
-                    <li>✅ Мониторинг 24/7</li>
-                    <li>✅ Оперативное исправление</li>
-                    <li>✅ Консультации</li>
-                </ul>
-                <a href="/register" class="block text-center w-full bg-white/10 py-3 rounded-xl hover:bg-white/20 transition font-bold">Подписаться</a>
-            </div>
+        <div id="orders-list" class="space-y-4">
+            <!-- Сюда будут загружаться заказы -->
         </div>
     </section>
 
-    <!-- FAQ Section -->
-    <section id="faq" class="py-24 px-4 max-w-3xl mx-auto w-full relative z-10">
-        <h2 class="text-4xl font-extrabold text-center mb-10">Частые вопросы</h2>
-        <div class="space-y-4">
-            <div class="glass p-6 rounded-2xl">
-                <h4 class="text-lg font-bold mb-2">Это легально?</h4>
-                <p class="text-gray-400 text-sm">Да. Мы проводим аудит только с письменного согласия владельца сайта. Мы не ломаем чужие ресурсы, а ищем уязвимости, чтобы их закрыть.</p>
-            </div>
-            <div class="glass p-6 rounded-2xl">
-                <h4 class="text-lg font-bold mb-2">Что я получу после оплаты?</h4>
-                <p class="text-gray-400 text-sm">Вы получите доступ в личный кабинет, где будет создан заказ. После проверки сайта вы получите подробный PDF-отчет со списком уязвимостей и способами их устранения.</p>
-            </div>
-            <div class="glass p-6 rounded-2xl">
-                <h4 class="text-lg font-bold mb-2">Вы гарантируете, что мой сайт не взломают?</h4>
-                <p class="text-gray-400 text-sm">Мы гарантируем, что найдем и закроем известные уязвимости, которые могут привести к взлому. Это значительно повышает безопасность, но 100% гарантию от всех хакеров в мире не даст никто.</p>
-            </div>
-            <div class="glass p-6 rounded-2xl">
-                <h4 class="text-lg font-bold mb-2">Как быстро вы работаете?</h4>
-                <p class="text-gray-400 text-sm">Аудит занимает до 24 часов. Исправление ошибок (если вы заказали полный тариф) — до 3 рабочих дней, в зависимости от сложности сайта.</p>
-            </div>
+    <!-- Модальное окно оплаты -->
+    <div id="pay-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-xl max-w-md w-full text-center relative shadow-2xl">
+            <button onclick="closePayModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl">✕</button>
+            <h3 class="text-2xl font-bold text-slate-900 mb-4">Оплата</h3>
+            <p class="text-slate-600 mb-6">Переведите <span id="pay-amount" class="font-bold"></span> по СБП на наш кошелек:</p>
+            <a href="https://yoomoney.ru/to/4100117382674034" target="_blank" class="block w-full btn-primary py-4 rounded-xl text-white font-bold text-lg mb-4">
+                Перейти к оплате
+            </a>
+            <p class="text-xs text-slate-500 mb-4">После оплаты нажмите кнопку ниже, чтобы мы активировали заказ.</p>
+            <button onclick="confirmPayment()" class="w-full bg-slate-100 py-3 rounded-lg text-slate-800 font-bold hover:bg-slate-200 transition">
+                Я оплатил
+            </button>
         </div>
-    </section>
+    </div>
 
-    <footer class="border-t border-white/10 py-10 text-center relative z-10">
-        <div class="flex justify-center items-center gap-2 mb-4">
-            <span class="text-2xl">🛡️</span>
-            <span class="text-xl font-bold">CyberGuard</span>
-        </div>
-        <p class="text-gray-500 text-sm">© 2026 CyberGuard. Защита вашего бизнеса.</p>
-    </footer>
+    <script>
+        // --- ЛОГИКА ОДНОСТРАНИЧНОГО ПРИЛОЖЕНИЯ ---
+        let isRegisterMode = false;
+        let currentOrderId = null;
 
+        // Проверка авторизации при загрузке
+        window.onload = () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                loadUserData(token);
+                showSection('dashboard');
+            } else {
+                showSection('landing');
+            }
+        };
+
+        // Навигация (скрыть все, показать одну)
+        function showSection(sectionId) {
+            const sections = ['landing', 'services', 'auth', 'dashboard'];
+            sections.forEach(id => {
+                document.getElementById(`section-${id}`).classList.add('hidden');
+            });
+            document.getElementById(`section-${sectionId}`).classList.remove('hidden');
+            
+            // Обновляем меню
+            const token = localStorage.getItem('token');
+            if (token) {
+                document.getElementById('auth-menu').classList.remove('hidden');
+                document.getElementById('guest-menu').classList.add('hidden');
+            } else {
+                document.getElementById('auth-menu').classList.add('hidden');
+                document.getElementById('guest-menu').classList.remove('hidden');
+            }
+            
+            if (sectionId === 'dashboard') {
+                loadOrders();
+            }
+        }
+
+        // --- АВТОРИЗАЦИЯ ---
+        function switchAuthMode() {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById('auth-title').textContent = isRegisterMode ? 'Регистрация' : 'Вход';
+            document.getElementById('auth-btn').textContent = isRegisterMode ? 'Создать аккаунт' : 'Войти';
+            document.getElementById('auth-switch-text').textContent = isRegisterMode ? 'Уже есть аккаунт?' : 'Нет аккаунта?';
+            document.getElementById('auth-switch-btn').textContent = isRegisterMode ? 'Войти' : 'Зарегистрироваться';
+            document.getElementById('terms-checkbox').classList.toggle('hidden', !isRegisterMode);
+        }
+
+        document.getElementById('auth-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            
+            const endpoint = isRegisterMode ? '/register' : '/token';
+            const formData = new URLSearchParams();
+            formData.append('username', email);
+            formData.append('password', password);
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    if (isRegisterMode) {
+                        alert('Регистрация успешна! Теперь войдите.');
+                        switchAuthMode(); // Переключаем на вход
+                    } else {
+                        const data = await response.json();
+                        localStorage.setItem('token', data.access_token);
+                        alert('Вы вошли!');
+                        loadUserData(data.access_token);
+                        showSection('dashboard');
+                    }
+                } else {
+                    const error = await response.json();
+                    alert('Ошибка: ' + (error.detail || 'Проверьте данные'));
+                }
+            } catch (err) {
+                alert('Ошибка соединения');
+            }
+        });
+
+        async function loadUserData(token) {
+            try {
+                const response = await fetch('/api/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('user-email').textContent = data.email;
+                } else {
+                    localStorage.removeItem('token');
+                    showSection('landing');
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            showSection('landing');
+        }
+
+        // --- ЗАКАЗЫ ---
+        async function startOrder(title, amount) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                // Если не авторизован, запоминаем заказ и кидаем на вход
+                localStorage.setItem('pending_order_title', title);
+                localStorage.setItem('pending_order_amount', amount);
+                showSection('auth');
+                return;
+            }
+
+            // Создаем заказ
+            try {
+                const response = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ title: title, amount: amount })
+                });
+
+                if (response.ok) {
+                    showSection('dashboard');
+                } else {
+                    alert('Ошибка создания заказа');
+                }
+            } catch (e) {
+                alert('Ошибка соединения');
+            }
+        }
+
+        async function loadOrders() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            // Проверяем, есть ли отложенный заказ (если человек пришел с лендинга)
+            const pendingTitle = localStorage.getItem('pending_order_title');
+            const pendingAmount = localStorage.getItem('pending_order_amount');
+            if (pendingTitle && pendingAmount) {
+                await startOrder(pendingTitle, parseInt(pendingAmount));
+                localStorage.removeItem('pending_order_title');
+                localStorage.removeItem('pending_order_amount');
+            }
+
+            const response = await fetch('/api/orders', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                const orders = await response.json();
+                const list = document.getElementById('orders-list');
+                list.innerHTML = '';
+
+                if (orders.length === 0) {
+                    list.innerHTML = '<p class="text-slate-500">У вас пока нет заказов.</p>';
+                    return;
+                }
+
+                orders.forEach(order => {
+                    const statusClass = order.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
+                    const statusText = order.status === 'paid' ? 'Оплачен' : 'Ожидает оплаты';
+                    
+                    const div = document.createElement('div');
+                    div.className = 'card rounded-xl p-6 flex justify-between items-center';
+                    div.innerHTML = `
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-lg">${order.title}</h3>
+                            <p class="text-sm text-slate-500">Заказ №${order.id} от ${new Date().toLocaleDateString()}</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="px-3 py-1 rounded-full ${statusClass} text-xs font-semibold block mb-2">${statusText}</span>
+                            ${order.status !== 'paid' ? `<button onclick="openPayModal(${order.id}, ${order.amount})" class="btn-primary px-4 py-2 rounded-md text-sm font-semibold">Оплатить</button>` : ''}
+                        </div>
+                    `;
+                    list.appendChild(div);
+                });
+            }
+        }
+
+        // --- ОПЛАТА ---
+        function openPayModal(orderId, amount) {
+            currentOrderId = orderId;
+            document.getElementById('pay-amount').textContent = amount + ' ₽';
+            const modal = document.getElementById('pay-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closePayModal() {
+            const modal = document.getElementById('pay-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        async function confirmPayment() {
+            const token = localStorage.getItem('token');
+            await fetch(`/api/confirm_payment/${currentOrderId}`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            alert('Спасибо! Мы проверим оплату и начнем работу.');
+            closePayModal();
+            loadOrders();
+        }
+    </script>
 </body>
 </html>
