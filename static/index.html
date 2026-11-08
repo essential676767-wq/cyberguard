@@ -3,173 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberGuard — Защита бизнеса</title>
+    <title>CyberGuard — Аудит безопасности</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
-        .btn-primary { background-color: #1e3a8a; color: white; transition: background 0.2s; }
-        .btn-primary:hover { background-color: #1e40af; }
-        .card { background: white; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .btn-primary { background: linear-gradient(90deg, #3b82f6, #2563eb); transition: all 0.3s ease; }
+        .btn-primary:hover { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); transform: translateY(-1px); }
+        .text-gradient { background: linear-gradient(90deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .input-field { background: #1e293b; border: 1px solid #334155; color: white; transition: border 0.2s; }
+        .input-field:focus { border-color: #3b82f6; outline: none; }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased min-h-screen flex flex-col">
 
     <!-- Навигация -->
-    <nav class="bg-white border-b border-gray-200 fixed top-0 w-full z-50">
+    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md fixed top-0 w-full z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20 items-center">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="showSection('landing')">
                     <span class="text-3xl">🛡️</span>
-                    <span class="text-2xl font-bold text-slate-900 tracking-tight">CyberGuard</span>
+                    <span class="text-2xl font-bold text-white tracking-tight">CyberGuard</span>
                 </div>
                 
-                <!-- Меню для авторизованных -->
-                <div id="auth-menu" class="hidden flex items-center gap-4">
-                    <span class="text-sm font-medium text-slate-600">Вы вошли как: <span id="user-email" class="font-bold"></span></span>
-                    <button onclick="logout()" class="text-red-600 font-medium text-sm hover:text-red-800">Выйти</button>
+                <div id="auth-menu" class="hidden flex items-center gap-6">
+                    <span class="text-sm text-slate-400">Вы вошли как: <span id="user-email" class="font-semibold text-white"></span></span>
+                    <button onclick="showSection('dashboard')" class="text-sm font-medium text-blue-400 hover:text-blue-300">Личный кабинет</button>
+                    <button onclick="logout()" class="text-sm font-medium text-red-400 hover:text-red-300">Выйти</button>
                 </div>
 
-                <!-- Меню для гостей -->
-                <div id="guest-menu" class="flex items-center gap-4">
-                    <button onclick="showSection('auth')" class="text-sm font-medium text-slate-600 hover:text-blue-800">Войти</button>
-                    <button onclick="showSection('services')" class="btn-primary px-5 py-2.5 rounded-md text-sm font-semibold">Заказать аудит</button>
+                <div id="guest-menu" class="flex items-center gap-6">
+                    <button onclick="showSection('auth')" class="text-sm font-medium text-slate-300 hover:text-white transition">Войти</button>
+                    <button onclick="showSection('services')" class="btn-primary px-6 py-2.5 rounded-lg text-sm font-semibold text-white">Заказать аудит</button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- СЕКЦИЯ 1: ЛЕНДИНГ (Главная) -->
-    <main id="section-landing" class="pt-32 pb-20 px-4">
-        <div class="max-w-4xl mx-auto text-center">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-800 text-xs font-semibold mb-6">
-                <span class="w-2 h-2 rounded-full bg-blue-600"></span> Работаем по всей России
+    <!-- СЕКЦИЯ 1: ЛЕНДИНГ -->
+    <main id="section-landing" class="flex-1 pt-32 pb-20 px-4 relative overflow-hidden">
+        <!-- Фоновые градиенты -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-blue-600/20 blur-[120px] rounded-full pointer-events-none"></div>
+        
+        <div class="max-w-5xl mx-auto text-center relative z-10">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium mb-8">
+                <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span> Работаем по всей России
             </div>
-            <h1 class="text-5xl md:text-6xl font-bold leading-tight mb-6 text-slate-900">
-                Безопасность вашего сайта — <br class="hidden md:block"> наша ответственность
+            <h1 class="text-5xl md:text-7xl font-extrabold leading-tight mb-8 text-white">
+                Безопасность вашего сайта — <br> 
+                <span class="text-gradient">наша ответственность</span>
             </h1>
-            <p class="text-lg text-slate-600 mb-10 max-w-2xl mx-auto">
-                Проводим профессиональный аудит безопасности, находим уязвимости и исправляем их. Защищаем ваш бизнес от штрафов и взломов.
+            <p class="text-xl text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed">
+                Проводим профессиональный аудит безопасности, находим уязвимости и даем четкие инструкции по их устранению. Защищаем ваш бизнес от штрафов и взломов.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <button onclick="showSection('services')" class="btn-primary px-8 py-3.5 rounded-md text-lg font-semibold">Заказать аудит</button>
-                <button onclick="showSection('about')" class="bg-white border border-gray-300 text-slate-700 px-8 py-3.5 rounded-md text-lg font-semibold hover:bg-gray-50">Подробнее</button>
+                <button onclick="showSection('services')" class="btn-primary px-10 py-4 rounded-xl text-lg font-bold text-white">Выбрать тариф</button>
+                <button onclick="showSection('auth')" class="glass px-10 py-4 rounded-xl text-lg font-semibold text-white hover:bg-slate-800 transition">Войти в кабинет</button>
+            </div>
+
+            <!-- Преимущества -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-24">
+                <div class="glass p-8 rounded-2xl text-left">
+                    <div class="text-3xl mb-4">⚡</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Скорость</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Отчет по вашему сайту будет готов в течение 24 часов после оплаты.</p>
+                </div>
+                <div class="glass p-8 rounded-2xl text-left">
+                    <div class="text-3xl mb-4">🎯</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Точность</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Ручная проверка и сканирование по 50+ параметрам безопасности.</p>
+                </div>
+                <div class="glass p-8 rounded-2xl text-left">
+                    <div class="text-3xl mb-4">📄</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Понятность</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Отчет без сложного технического сленга, с готовыми решениями для разработчика.</p>
+                </div>
             </div>
         </div>
     </main>
 
     <!-- СЕКЦИЯ 2: УСЛУГИ И ТАРИФЫ -->
-    <section id="section-services" class="hidden pt-32 pb-20 px-4 max-w-7xl mx-auto">
-        <h2 class="text-3xl font-bold text-center text-slate-900 mb-12">Наши тарифы</h2>
+    <section id="section-services" class="hidden flex-1 pt-32 pb-20 px-4 max-w-7xl mx-auto w-full">
+        <h2 class="text-4xl font-bold text-center text-white mb-4">Выберите уровень защиты</h2>
+        <p class="text-slate-400 text-center mb-16 max-w-2xl mx-auto">Каждый тариф включает детальный PDF-отчет с приоритетами для вашего разработчика.</p>
+        
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <!-- Тариф 1 -->
-            <div class="card p-8 rounded-xl flex flex-col">
-                <h3 class="text-xl font-bold text-slate-900 mb-1">Аудит</h3>
-                <p class="text-slate-500 text-sm mb-6">Только поиск проблем</p>
-                <div class="text-4xl font-bold text-slate-900 mb-6">5 000 ₽</div>
-                <ul class="text-sm text-slate-600 space-y-3 mb-8 flex-1">
-                    <li class="flex items-center gap-2">✓ Сканирование сайта</li>
-                    <li class="flex items-center gap-2">✓ Отчет в PDF</li>
-                    <li class="flex items-center gap-2">✓ Список уязвимостей</li>
+            <div class="glass p-8 rounded-2xl flex flex-col border border-slate-700 hover:border-slate-500 transition">
+                <h3 class="text-xl font-bold text-white mb-1">Аудит</h3>
+                <p class="text-slate-400 text-sm mb-6">Только поиск проблем</p>
+                <div class="text-4xl font-bold text-white mb-6">5 000 ₽</div>
+                <ul class="text-sm text-slate-300 space-y-4 mb-8 flex-1">
+                    <li class="flex items-center gap-3"><span class="text-blue-500">✓</span> Сканирование сайта</li>
+                    <li class="flex items-center gap-3"><span class="text-blue-500">✓</span> Отчет в PDF</li>
+                    <li class="flex items-center gap-3"><span class="text-blue-500">✓</span> Список уязвимостей</li>
                 </ul>
-                <button onclick="startOrder('Аудит', 5000)" class="block text-center w-full btn-primary py-3 rounded-md font-semibold text-white">Заказать</button>
+                <button onclick="startOrder('Аудит', 5000)" class="w-full bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-xl font-semibold transition">Заказать</button>
             </div>
             <!-- Тариф 2 -->
-            <div class="card p-8 rounded-xl flex flex-col border-2 border-blue-800 relative shadow-lg">
-                <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-800 text-white px-4 py-1 rounded-full text-xs font-bold tracking-wider">РЕКОМЕНДУЕМ</div>
-                <h3 class="text-xl font-bold text-slate-900 mb-1">Аудит + Исправление</h3>
-                <p class="text-slate-500 text-sm mb-6">Полное решение под ключ</p>
-                <div class="text-4xl font-bold text-slate-900 mb-6">15 000 ₽</div>
-                <ul class="text-sm text-slate-600 space-y-3 mb-8 flex-1">
-                    <li class="flex items-center gap-2">✓ Всё из тарифа "Аудит"</li>
-                    <li class="flex items-center gap-2">✓ Исправление ошибок</li>
-                    <li class="flex items-center gap-2">✓ Настройка защиты</li>
+            <div class="glass p-8 rounded-2xl flex flex-col border-2 border-blue-500 relative shadow-[0_0_30px_rgba(59,130,246,0.3)]">
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-xs font-bold tracking-wider">РЕКОМЕНДУЕМ</div>
+                <h3 class="text-xl font-bold text-white mb-1">Аудит + Исправление</h3>
+                <p class="text-slate-400 text-sm mb-6">Полное решение под ключ</p>
+                <div class="text-4xl font-bold text-white mb-6">15 000 ₽</div>
+                <ul class="text-sm text-slate-300 space-y-4 mb-8 flex-1">
+                    <li class="flex items-center gap-3"><span class="text-blue-500">✓</span> Всё из тарифа "Аудит"</li>
+                    <li class="flex items-center gap-3"><span class="text-blue-500">✓</span> Инструкции по исправлению</li>
+                    <li class="flex items-center gap-3"><span class="text-blue-500">✓</span> Настройка защиты</li>
                 </ul>
-                <button onclick="startOrder('Аудит + Исправление', 15000)" class="block text-center w-full btn-primary py-3 rounded-md font-semibold text-white">Заказать</button>
+                <button onclick="startOrder('Аудит + Исправление', 15000)" class="w-full btn-primary py-3 rounded-xl font-semibold text-white">Заказать</button>
             </div>
             <!-- Тариф 3 -->
-            <div class="card p-8 rounded-xl flex flex-col">
-                <h3 class="text-xl font-bold text-slate-900 mb-1">Под защитой</h3>
-                <p class="text-slate-500 text-sm mb-6">Ежемесячное обслуживание</p>
-                <div class="text-4xl font-bold text-slate-900 mb-6">5 000 ₽<span class="text-lg text-slate-500 font-normal">/мес</span></div>
-                <ul class="text-sm text-slate-600 space-y-3 mb-8 flex-1">
-                    <li class="flex items-center gap-2">✓ Мониторинг 24/7</li>
-                    <li class="flex items-center gap-2">✓ Оперативное исправление</li>
-                    <li class="flex items-center gap-2">✓ Консультации</li>
+            <div class="glass p-8 rounded-2xl flex flex-col border border-slate-700 hover:border-slate-500 transition">
+                <h3 class="text-xl font-bold text-white mb-1">Под защитой</h3>
+                <p class="text-slate-400 text-sm mb-6">Ежемесячное обслуживание</p>
+                <div class="text-4xl font-bold text-white mb-6">5 000 ₽<span class="text-lg text-slate-400 font-normal">/мес</span></div>
+                <ul class="text-sm text-slate-300 space-y-4 mb-8 flex-1">
+                    <li class="flex items-center gap-3"><span class="text-blue-500">✓</span> Мониторинг 24/7</li>
+                    <li class="flex items-center gap-3"><span class="text-blue-500">✓</span> Оперативное исправление</li>
+                    <li class="flex items-center gap-3"><span class="text-blue-500">✓</span> Консультации</li>
                 </ul>
-                <button onclick="startOrder('Под защитой', 5000)" class="block text-center w-full bg-slate-100 py-3 rounded-md hover:bg-slate-200 transition font-semibold text-slate-800">Заказать</button>
+                <button onclick="startOrder('Под защитой', 5000)" class="w-full bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-xl font-semibold transition">Заказать</button>
             </div>
         </div>
     </section>
 
     <!-- СЕКЦИЯ 3: АВТОРИЗАЦИЯ / РЕГИСТРАЦИЯ -->
-    <section id="section-auth" class="hidden pt-32 pb-20 px-4">
-        <div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-md border border-gray-200">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6 text-center" id="auth-title">Вход</h2>
+    <section id="section-auth" class="hidden flex-1 pt-32 pb-20 px-4">
+        <div class="max-w-md mx-auto glass p-10 rounded-2xl shadow-2xl relative z-10">
+            <h2 class="text-3xl font-bold text-white mb-8 text-center" id="auth-title">Вход</h2>
             
-            <form id="auth-form" class="space-y-5">
+            <form id="auth-form" class="space-y-6">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
-                    <input type="email" id="auth-email" required class="w-full bg-slate-50 border border-gray-300 rounded-md px-4 py-2.5 text-slate-900 focus:outline-none focus:border-blue-800">
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Email</label>
+                    <input type="email" id="auth-email" required class="input-field w-full rounded-lg px-4 py-3">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Пароль</label>
-                    <input type="password" id="auth-password" required class="w-full bg-slate-50 border border-gray-300 rounded-md px-4 py-2.5 text-slate-900 focus:outline-none focus:border-blue-800">
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Пароль</label>
+                    <input type="password" id="auth-password" required class="input-field w-full rounded-lg px-4 py-3">
                 </div>
                 
-                <!-- Галочка согласия (только при регистрации) -->
-                <div id="terms-checkbox" class="hidden flex items-start">
-                    <input id="terms" type="checkbox" required class="mt-1 h-4 w-4 text-blue-800 border-gray-300 rounded">
-                    <label for="terms" class="ml-2 text-sm text-slate-700">
-                        Я согласен с <a href="/offer" target="_blank" class="text-blue-800 hover:underline">офертой</a>, <a href="/terms" target="_blank" class="text-blue-800 hover:underline">условиями</a> и <a href="/privacy" target="_blank" class="text-blue-800 hover:underline">политикой</a>.
+                <div id="terms-checkbox" class="hidden items-start">
+                    <input id="terms" type="checkbox" required class="mt-1 h-4 w-4 rounded border-slate-600 bg-slate-800 text-blue-500 focus:ring-blue-500">
+                    <label for="terms" class="ml-3 text-sm text-slate-400">
+                        Я согласен с <a href="/offer" target="_blank" class="text-blue-400 hover:underline">офертой</a>, <a href="/terms" target="_blank" class="text-blue-400 hover:underline">условиями</a> и <a href="/privacy" target="_blank" class="text-blue-400 hover:underline">политикой</a>.
                     </label>
                 </div>
 
-                <button type="submit" id="auth-btn" class="w-full btn-primary py-3 rounded-md font-semibold text-white">Войти</button>
+                <button type="submit" id="auth-btn" class="w-full btn-primary py-3.5 rounded-xl font-bold text-white text-lg">Войти</button>
             </form>
             
-            <p class="text-center text-slate-500 mt-6 text-sm">
+            <p class="text-center text-slate-400 mt-8 text-sm">
                 <span id="auth-switch-text">Нет аккаунта?</span> 
-                <button onclick="switchAuthMode()" class="text-blue-800 font-medium hover:underline" id="auth-switch-btn">Зарегистрироваться</button>
+                <button onclick="switchAuthMode()" class="text-blue-400 font-semibold hover:underline ml-1" id="auth-switch-btn">Зарегистрироваться</button>
             </p>
         </div>
     </section>
 
-    <!-- СЕКЦИЯ 4: ЛИЧНЫЙ КАБИНЕТ (Заказы) -->
-    <section id="section-dashboard" class="hidden pt-32 pb-20 px-4 max-w-4xl mx-auto">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-3xl font-bold text-slate-900">Мои заказы</h2>
-            <button onclick="showSection('services')" class="text-sm font-medium text-blue-800 hover:underline">+ Новый заказ</button>
+    <!-- СЕКЦИЯ 4: ЛИЧНЫЙ КАБИНЕТ -->
+    <section id="section-dashboard" class="hidden flex-1 pt-32 pb-20 px-4 max-w-4xl mx-auto w-full">
+        <div class="flex justify-between items-end mb-10 border-b border-slate-800 pb-6">
+            <div>
+                <h2 class="text-3xl font-bold text-white">Личный кабинет</h2>
+                <p class="text-slate-400 mt-2">Управление заказами и отчетами</p>
+            </div>
+            <button onclick="showSection('services')" class="btn-primary px-5 py-2.5 rounded-lg text-sm font-semibold text-white">+ Новый заказ</button>
         </div>
         
         <div id="orders-list" class="space-y-4">
-            <!-- Сюда будут загружаться заказы -->
+            <!-- Заказы -->
         </div>
     </section>
 
     <!-- Модальное окно оплаты -->
-    <div id="pay-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white p-8 rounded-xl max-w-md w-full text-center relative shadow-2xl">
-            <button onclick="closePayModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl">✕</button>
-            <h3 class="text-2xl font-bold text-slate-900 mb-4">Оплата</h3>
-            <p class="text-slate-600 mb-6">Переведите <span id="pay-amount" class="font-bold"></span> по СБП на наш кошелек:</p>
+    <div id="pay-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="glass p-10 rounded-2xl max-w-md w-full text-center relative shadow-2xl">
+            <button onclick="closePayModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl transition">✕</button>
+            <h3 class="text-2xl font-bold text-white mb-4">Оплата заказа</h3>
+            <p class="text-slate-300 mb-8">Переведите <span id="pay-amount" class="font-bold text-white text-xl"></span> по СБП на наш кошелек:</p>
             <a href="https://yoomoney.ru/to/4100117382674034" target="_blank" class="block w-full btn-primary py-4 rounded-xl text-white font-bold text-lg mb-4">
                 Перейти к оплате
             </a>
-            <p class="text-xs text-slate-500 mb-4">После оплаты нажмите кнопку ниже, чтобы мы активировали заказ.</p>
-            <button onclick="confirmPayment()" class="w-full bg-slate-100 py-3 rounded-lg text-slate-800 font-bold hover:bg-slate-200 transition">
+            <p class="text-xs text-slate-400 mb-6">После оплаты нажмите кнопку ниже, чтобы мы активировали заказ.</p>
+            <button onclick="confirmPayment()" class="w-full bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-lg font-bold transition">
                 Я оплатил
             </button>
         </div>
     </div>
 
     <script>
-        // --- ЛОГИКА ОДНОСТРАНИЧНОГО ПРИЛОЖЕНИЯ ---
         let isRegisterMode = false;
         let currentOrderId = null;
 
-        // Проверка авторизации при загрузке
         window.onload = () => {
             const token = localStorage.getItem('token');
             if (token) {
@@ -180,7 +207,6 @@
             }
         };
 
-        // Навигация (скрыть все, показать одну)
         function showSection(sectionId) {
             const sections = ['landing', 'services', 'auth', 'dashboard'];
             sections.forEach(id => {
@@ -188,7 +214,6 @@
             });
             document.getElementById(`section-${sectionId}`).classList.remove('hidden');
             
-            // Обновляем меню
             const token = localStorage.getItem('token');
             if (token) {
                 document.getElementById('auth-menu').classList.remove('hidden');
@@ -203,7 +228,6 @@
             }
         }
 
-        // --- АВТОРИЗАЦИЯ ---
         function switchAuthMode() {
             isRegisterMode = !isRegisterMode;
             document.getElementById('auth-title').textContent = isRegisterMode ? 'Регистрация' : 'Вход';
@@ -233,7 +257,7 @@
                 if (response.ok) {
                     if (isRegisterMode) {
                         alert('Регистрация успешна! Теперь войдите.');
-                        switchAuthMode(); // Переключаем на вход
+                        switchAuthMode();
                     } else {
                         const data = await response.json();
                         localStorage.setItem('token', data.access_token);
@@ -272,18 +296,15 @@
             showSection('landing');
         }
 
-        // --- ЗАКАЗЫ ---
         async function startOrder(title, amount) {
             const token = localStorage.getItem('token');
             if (!token) {
-                // Если не авторизован, запоминаем заказ и кидаем на вход
                 localStorage.setItem('pending_order_title', title);
                 localStorage.setItem('pending_order_amount', amount);
                 showSection('auth');
                 return;
             }
 
-            // Создаем заказ
             try {
                 const response = await fetch('/api/orders', {
                     method: 'POST',
@@ -294,7 +315,7 @@
                 if (response.ok) {
                     showSection('dashboard');
                 } else {
-                    alert('Ошибка создания заказа');
+                    alert('Ошибка создания заказа. Проверьте, что вы авторизованы.');
                 }
             } catch (e) {
                 alert('Ошибка соединения');
@@ -305,7 +326,6 @@
             const token = localStorage.getItem('token');
             if (!token) return;
 
-            // Проверяем, есть ли отложенный заказ (если человек пришел с лендинга)
             const pendingTitle = localStorage.getItem('pending_order_title');
             const pendingAmount = localStorage.getItem('pending_order_amount');
             if (pendingTitle && pendingAmount) {
@@ -324,24 +344,24 @@
                 list.innerHTML = '';
 
                 if (orders.length === 0) {
-                    list.innerHTML = '<p class="text-slate-500">У вас пока нет заказов.</p>';
+                    list.innerHTML = '<div class="text-center py-10 text-slate-400">У вас пока нет заказов. <button onclick="showSection(\'services\')" class="text-blue-400 hover:underline">Выбрать тариф</button></div>';
                     return;
                 }
 
                 orders.forEach(order => {
-                    const statusClass = order.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
+                    const statusClass = order.status === 'paid' ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
                     const statusText = order.status === 'paid' ? 'Оплачен' : 'Ожидает оплаты';
                     
                     const div = document.createElement('div');
-                    div.className = 'card rounded-xl p-6 flex justify-between items-center';
+                    div.className = 'glass rounded-xl p-6 flex flex-col md:flex-row justify-between items-center gap-4';
                     div.innerHTML = `
                         <div>
-                            <h3 class="font-bold text-slate-900 text-lg">${order.title}</h3>
-                            <p class="text-sm text-slate-500">Заказ №${order.id} от ${new Date().toLocaleDateString()}</p>
+                            <h3 class="font-bold text-white text-lg">${order.title}</h3>
+                            <p class="text-sm text-slate-400 mt-1">Заказ №${order.id}</p>
                         </div>
-                        <div class="text-right">
-                            <span class="px-3 py-1 rounded-full ${statusClass} text-xs font-semibold block mb-2">${statusText}</span>
-                            ${order.status !== 'paid' ? `<button onclick="openPayModal(${order.id}, ${order.amount})" class="btn-primary px-4 py-2 rounded-md text-sm font-semibold">Оплатить</button>` : ''}
+                        <div class="text-right flex items-center gap-4">
+                            <span class="px-3 py-1 rounded-full border ${statusClass} text-xs font-semibold">${statusText}</span>
+                            ${order.status !== 'paid' ? `<button onclick="openPayModal(${order.id}, ${order.amount})" class="btn-primary px-5 py-2 rounded-lg text-sm font-semibold text-white">Оплатить</button>` : ''}
                         </div>
                     `;
                     list.appendChild(div);
@@ -349,7 +369,6 @@
             }
         }
 
-        // --- ОПЛАТА ---
         function openPayModal(orderId, amount) {
             currentOrderId = orderId;
             document.getElementById('pay-amount').textContent = amount + ' ₽';
