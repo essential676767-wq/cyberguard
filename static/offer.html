@@ -3,52 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Договор-оферта — CyberGuard</title>
+    <title>Оферта — CyberGuard</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <style> body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; } </style>
+    <style> body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; } </style>
 </head>
 <body class="p-8">
-    <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-gray-200">
-        <h1 class="text-3xl font-bold mb-6">Договор-оферта на оказание ИБ-услуг</h1>
-        <p class="mb-4 text-sm text-gray-500">Дата последнего обновления: 09.11.2026</p>
+    <div class="max-w-3xl mx-auto bg-slate-800 p-8 rounded-2xl shadow-xl border border-slate-700">
+        <h1 class="text-3xl font-bold mb-6 text-white">Договор-оферта</h1>
+        <p class="mb-4 text-sm text-slate-400">Дата: 09.11.2026</p>
 
-        <h2 class="text-xl font-bold mt-6 mb-2">1. ПРЕДМЕТ ДОГОВОРА</h2>
-        <p class="mb-4">1.1. Исполнитель (CyberGuard) обязуется провести автоматизированный анализ защищенности (пентест) веб-ресурса Заказчика, указанного в ТЗ, а Заказчик обязуется принять и оплатить данные услуги согласно выбранному тарифу.</p>
+        <h2 class="text-xl font-bold mt-6 mb-2 text-blue-400">1. ПРЕДМЕТ</h2>
+        <p class="mb-4 text-slate-300">Исполнитель (CyberGuard) проводит аудит безопасности сайта Заказчика.</p>
 
-        <h2 class="text-xl font-bold mt-6 mb-2">2. РАЗРЕШЕННЫЕ ДЕЙСТВИЯ И ОГРАНИЧЕНИЯ</h2>
-        <p class="mb-4">2.1. Заказчик дает полное согласие на следующие действия Исполнителя:</p>
-        <ul class="list-disc pl-6 mb-4">
-            <li>Автоматизированное сканирование уязвимостей.</li>
-            <li>Анализ конфигурации безопасности (заголовки, ошибки сервера, CORS, CSP).</li>
-            <li>Проверка на уязвимости (SQL-инъекции, XSS, IDOR, CSRF) без деструктивного воздействия.</li>
-        </ul>
-        <p class="mb-4"><strong>2.2. КРАСНЫЕ ЛИНИИ.</strong> Исполнителю строго запрещено:</p>
-        <ul class="list-disc pl-6 mb-4">
-            <li>Проведение DDoS-атак и искусственное создание пиковых нагрузок.</li>
-            <li>Удаление, изменение или модификация любых данных в базах данных Заказчика.</li>
-            <li>Тестирование сторонних систем, не указанных Заказчиком.</li>
-        </ul>
+        <h2 class="text-xl font-bold mt-6 mb-2 text-blue-400">2. ДЕЙСТВИЯ</h2>
+        <p class="mb-4 text-slate-300">Разрешено: сканирование уязвимостей, анализ конфигурации (CSP, HSTS, SQLi, XSS). Запрещено: DDoS-атаки, изменение данных.</p>
 
-        <h2 class="text-xl font-bold mt-6 mb-2">3. ПРАВА И ГАРАНТИИ СТОРОН</h2>
-        <p class="mb-4">3.1. Заказчик гарантирует, что является законным владельцем (или уполномоченным представителем) тестируемого веб-ресурса и имеет полное юридическое право разрешать проведение данных работ.</p>
-        <p class="mb-4">3.2. Исполнитель гарантирует соблюдение полной конфиденциальности (NDA). Все данные об обнаруженных уязвимостях передаются строго Заказчику в виде PDF-отчета и не подлежат разглашению третьим лицам.</p>
+        <h2 class="text-xl font-bold mt-6 mb-2 text-blue-400">3. ОТВЕТСТВЕННОСТЬ</h2>
+        <p class="mb-4 text-slate-300">Заказчик гарантирует, что является владельцем сайта. Исполнитель не несет ответственности за временные сбои во время тестов.</p>
 
-        <h2 class="text-xl font-bold mt-6 mb-2">4. ОТКАЗ ОТ ОТВЕТСТВЕННОСТИ</h2>
-        <p class="mb-4">4.1. Заказчик уведомлен и согласен, что процесс автоматизированного тестирования сопряжен с техническими рисками. Исполнитель не несет ответственности за временные сбои, замедление работы или кратковременную недоступность веб-ресурса Заказчика, вызванную прохождением тестов.</p>
+        <h2 class="text-xl font-bold mt-6 mb-2 text-blue-400">4. ОПЛАТА</h2>
+        <p class="mb-4 text-slate-300">100% предоплата. Срок аудита — до 24 часов.</p>
 
-        <h2 class="text-xl font-bold mt-6 mb-2">5. СТОИМОСТЬ УСЛУГ И ПОРЯДОК ОПЛАТЫ</h2>
-        <p class="mb-4">5.1. Стоимость услуг определяется тарифом, выбранным Заказчиком на сайте Исполнителя.</p>
-        <p class="mb-4">5.2. Услуги оказываются на условиях 100% предоплаты. Оплата производится переводом по реквизитам Исполнителя (ЮMoney).</p>
-
-        <h2 class="text-xl font-bold mt-6 mb-2">6. СРОКИ И ПРИЕМКА РАБОТ</h2>
-        <p class="mb-4">6.1. Срок проведения автоматического аудита составляет до 24 часов с момента оплаты.</p>
-        <p class="mb-4">6.2. Результатом работ является предоставление Заказчику подробного технического отчета. Услуги считаются оказанными в полном объеме с момента передачи отчета.</p>
-
-        <p class="mt-8 text-sm text-gray-500">Оплата услуг на сайте означает полное согласие с условиями данной оферты.</p>
-        
-        <a href="/" class="inline-block mt-8 text-blue-800 font-medium hover:underline">← Вернуться на главную</a>
+        <a href="/" class="inline-block mt-8 text-blue-400 hover:underline">← На главную</a>
     </div>
 </body>
 </html>
