@@ -41,9 +41,15 @@
 
     <script>
         let currentUserId = null;
+        const getCookie = (name) => {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        };
+        function getToken() { return localStorage.getItem('token') || getCookie('access_token'); }
 
         async function loadChats() {
-            const token = localStorage.getItem('token');
+            const token = getToken();
             const response = await fetch('/api/admin/chats', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -51,12 +57,17 @@
                 const chats = await response.json();
                 const list = document.getElementById('chatList');
                 list.innerHTML = '';
+                if (chats.length === 0) {
+                    list.innerHTML = '<p class="text-sm text-gray-500">Нет активных чатов</p>';
+                    return;
+                }
                 chats.forEach(chat => {
                     const div = document.createElement('div');
                     div.className = 'p-3 border border-gray-100 rounded-lg cursor-pointer hover:bg-gray-50';
+                    const lastMsg = chat.messages[chat.messages.length - 1];
                     div.innerHTML = `
                         <div class="font-semibold text-sm">${chat.email}</div>
-                        <div class="text-xs text-gray-500">${chat.messages[chat.messages.length - 1].text.substring(0, 30)}...</div>
+                        <div class="text-xs text-gray-500 truncate">${lastMsg ? lastMsg.text : 'Нет сообщений'}</div>
                     `;
                     div.onclick = () => openChat(chat);
                     list.appendChild(div);
@@ -74,7 +85,9 @@
             container.innerHTML = '';
             chat.messages.forEach(msg => {
                 const div = document.createElement('div');
-                div.className = msg.is_admin
+                // В базе поле называется is_from_admin, но на фронте мы используем is_admin для удобства
+                const isAdmin = msg.is_admin !== undefined ? msg.is_admin : msg.is_from_admin;
+                div.className = isAdmin
                     ? 'bg-blue-100 text-blue-900 p-3 rounded-lg ml-auto max-w-[80%] w-fit'
                     : 'bg-white border border-gray-200 text-slate-800 p-3 rounded-lg mr-auto max-w-[80%] w-fit';
                 div.textContent = msg.text;
@@ -88,7 +101,7 @@
             const text = input.value;
             if (!text || !currentUserId) return;
 
-            const token = localStorage.getItem('token');
+            const token = getToken();
             const response = await fetch('/api/admin/reply', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -98,7 +111,6 @@
             if (response.ok) {
                 input.value = '';
                 loadChats(); // Обновляем список
-                // Добавляем сообщение в окно
                 const container = document.getElementById('chatMessages');
                 const div = document.createElement('div');
                 div.className = 'bg-blue-100 text-blue-900 p-3 rounded-lg ml-auto max-w-[80%] w-fit';
@@ -108,7 +120,12 @@
             }
         }
 
-        loadChats();
+        window.onload = () => {
+            if (!getToken()) { window.location.href = '/login'; return; }
+            loadChats();
+            // Автообновление списка чатов каждые 5 секунд
+            setInterval(loadChats, 5000);
+        };
     </script>
 </body>
 </html>
