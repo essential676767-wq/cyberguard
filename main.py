@@ -19,7 +19,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 365 # 1 год
 
 app = FastAPI()
 os.makedirs(os.path.join(BASE_DIR, "static", "avatars"), exist_ok=True)
-os.makedirs(os.path.join(BASE_DIR, "static", "uploads"), exist_ok=True)
 
 def get_db():
     db = SessionLocal()
