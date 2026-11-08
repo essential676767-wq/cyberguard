@@ -91,13 +91,17 @@
             if (parts.length === 2) return parts.pop().split(';').shift();
         };
 
+        function getToken() {
+            return localStorage.getItem('token') || getCookie('access_token');
+        }
+
         function toggleChat() {
             document.getElementById('chatBox').classList.toggle('chat-open');
             if (document.getElementById('chatBox').classList.contains('chat-open')) loadChatHistory();
         }
 
         async function loadChatHistory() {
-            const token = localStorage.getItem('token') || getCookie('access_token');
+            const token = getToken();
             if (!token) return;
             const response = await fetch('/api/chat/history', { headers: { 'Authorization': `Bearer ${token}` } });
             if (response.ok) {
@@ -118,7 +122,7 @@
             const input = document.getElementById('chatInput');
             const text = input.value;
             if (!text) return;
-            const token = localStorage.getItem('token') || getCookie('access_token');
+            const token = getToken();
             const container = document.getElementById('chatMessages');
             const div = document.createElement('div');
             div.className = 'bg-white border border-gray-200 text-slate-800 p-2 rounded-lg ml-auto max-w-[80%]';
@@ -137,7 +141,7 @@
 
         // --- ЗАКАЗЫ ---
         async function loadOrders() {
-            const token = localStorage.getItem('token') || getCookie('access_token');
+            const token = getToken();
             const response = await fetch('/api/orders', { headers: { 'Authorization': `Bearer ${token}` } });
             if (response.ok) {
                 const orders = await response.json();
@@ -188,7 +192,7 @@
             const formData = new FormData();
             formData.append('file', file);
 
-            const token = localStorage.getItem('token') || getCookie('access_token');
+            const token = getToken();
             const response = await fetch('/api/upload_file', {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` },
@@ -203,27 +207,31 @@
         }
 
         async function payOrder(orderId) {
-            const token = localStorage.getItem('token') || getCookie('access_token');
+            const token = getToken();
             const response = await fetch(`/api/pay/${orderId}`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
             if (response.ok) {
                 const data = await response.json();
                 window.open(data.link, '_blank');
-                alert('Переведите 5000 ₽ по открывшейся ссылке. После оплаты нажмите "Я оплатил".');
+                alert('Переведите средства по открывшейся ссылке. После оплаты нажмите "Я оплатил".');
                 loadOrders();
             } else {
                 alert('Ошибка создания заказа');
             }
         }
 
-        window.confirmPayment = async (orderId) => {
-            const token = localStorage.getItem('token') || getCookie('access_token');
-            await fetch(`/api/confirm_payment/${orderId}`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
-            alert('Спасибо! Мы проверим оплату и приступим к работе.');
-            window.location.reload();
+        async function confirmPayment(orderId) {
+            const token = getToken();
+            const response = await fetch(`/api/confirm_payment/${orderId}`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+            if (response.ok) {
+                alert('Спасибо! Мы проверим оплату и приступим к работе.');
+                window.location.reload();
+            } else {
+                alert('Ошибка подтверждения оплаты. Попробуйте позже.');
+            }
         }
 
         window.onload = async () => {
-            const token = localStorage.getItem('token') || getCookie('access_token');
+            const token = getToken();
             if (!token) { window.location.href = '/login'; return; }
             
             try {
