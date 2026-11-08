@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, Request, UploadFile, File, Form
+from fastapi import FastAPI, Depends, HTTPException, Request, UploadFile, File
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -11,6 +11,10 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 from database import SessionLocal, User, Message, Order
 
+# Для отправки почты
+import aiosmtplib
+from email.message import EmailMessage
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv()
 
@@ -20,7 +24,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 365 # 1 год
 
 app = FastAPI()
 
-# --- CORS (разрешаем запросы с любых доменов для теста) ---
+# --- CORS ---
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], 
@@ -79,10 +83,28 @@ def create_access_token(data: dict):
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
+# --- ОТПРАВКА ПОЧТЫ ---
+async def send_email_async(to_email: str, code: str):
+    message = EmailMessage()
+    message["From"] = os.getenv("SMTP_USER")
+    message["To"] = to_email
+    message["Subject"] = "Код подтверждения — CyberGuard"
+    message.set_content(f"Здравствуйте!\n\nВаш код подтверждения для входа в CyberGuard: {code}\n\nНикому не сообщайте этот код.")
+
+    await aiosmtplib.send(
+        message,
+        hostname=os.getenv("SMTP_SERVER"),
+        port=int(os.getenv("SMTP_PORT")),
+        username=os.getenv("SMTP_USER"),
+        password=os.getenv("SMTP_PASSWORD"),
+        use_tls=True,
+        timeout=15
+    )
+
 # --- АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ ---
 
 @app.post("/register")
-def register(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+async def register(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     if db.query(User).filter(User.email == form_data.username).first():
         raise HTTPException(status_code=400, detail="Email уже занят")
     
@@ -96,9 +118,13 @@ def register(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Dep
     db.add(new_user)
     db.commit()
     
-    # В реальности здесь нужно отправить код на почту через SMTP.
-    # Для теста возвращаем код прямо в ответе.
-    return {"message": "OK", "code": code}
+    try:
+        await send_email_async(form_data.username, code)
+    except Exception as e:
+        print(f"ОШИБКА ОТПРАВКИ ПОЧТЫ: {e}")
+        raise HTTPException(status_code=500, detail="Не удалось отправить письмо. Проверьте настройки почты или попробуйте позже.")
+    
+    return {"message": "Код отправлен на почту"}
 
 @app.post("/api/verify_code")
 def verify_code(email: str, code: str, db: Session = Depends(get_db)):
@@ -118,7 +144,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         raise HTTPException(status_code=401, detail="Неверный логин или пароль")
     
     if not user.is_active:
-        raise HTTPException(status_code=400, detail="Подтвердите почту перед входом")
+        raise HTTPException(status_code=403, detail="Почта не подтверждена. Пожалуйста, введите код из письма.")
         
     return {"access_token": create_access_token(data={"sub": user.email}), "token_type": "bearer"}
 
