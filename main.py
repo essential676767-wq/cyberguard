@@ -15,7 +15,7 @@ load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY", "fallback_secret_key")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 365 # 1 год
 
 app = FastAPI()
 os.makedirs(os.path.join(BASE_DIR, "static", "avatars"), exist_ok=True)
@@ -62,40 +62,16 @@ def create_access_token(data: dict):
 def register(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     if db.query(User).filter(User.email == form_data.username).first():
         raise HTTPException(status_code=400, detail="Email занят")
-    
-    code = str(random.randint(100000, 999999))
-    
-    new_user = User(
-        email=form_data.username, 
-        hashed_password=get_password_hash(form_data.password), 
-        is_active=False,
-        confirmation_token=code
-    )
+    new_user = User(email=form_data.username, hashed_password=get_password_hash(form_data.password), is_active=True)
     db.add(new_user)
     db.commit()
-    
-    return {"message": "Код сгенерирован", "code": code}
-
-@app.post("/api/verify_code")
-def verify_code(email: str, code: str, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == email).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="Пользователь не найден")
-    if user.confirmation_token != code:
-        raise HTTPException(status_code=400, detail="Неверный код")
-    
-    user.is_active = True
-    user.confirmation_token = None
-    db.commit()
-    return {"message": "Почта подтверждена! Теперь войдите."}
+    return {"message": "OK"}
 
 @app.post("/token")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == form_data.username).first()
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Неверный логин или пароль")
-    if not user.is_active:
-        raise HTTPException(status_code=403, detail="Подтвердите почту.")
     return {"access_token": create_access_token(data={"sub": user.email}), "token_type": "bearer"}
 
 @app.get("/api/me")
@@ -120,15 +96,6 @@ def get_orders(user: User = Depends(get_current_user), db: Session = Depends(get
     orders = db.query(Order).filter(Order.user_id == user.id).order_by(Order.created_at.desc()).all()
     return [{"id": o.id, "title": o.title, "amount": o.amount, "status": o.status} for o in orders]
 
-@app.post("/api/pay/{order_id}")
-def pay_order(order_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    order = db.query(Order).filter(Order.id == order_id, Order.user_id == user.id).first()
-    if not order:
-        raise HTTPException(status_code=404, detail="Заказ не найден")
-    order.status = "pending"
-    db.commit()
-    return {"link": "https://yoomoney.ru/to/4100117382674034"}
-
 @app.post("/api/confirm_payment/{order_id}")
 def confirm_payment(order_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     order = db.query(Order).filter(Order.id == order_id, Order.user_id == user.id).first()
@@ -136,18 +103,6 @@ def confirm_payment(order_id: int, user: User = Depends(get_current_user), db: S
         order.status = "paid"
         db.commit()
     return {"status": "ok"}
-
-# --- ЗАГРУЗКА ФАЙЛОВ ---
-@app.post("/api/upload_file")
-async def upload_file(file: UploadFile = File(...), user: User = Depends(get_current_user)):
-    user_dir = os.path.join(BASE_DIR, "static", "uploads", str(user.id))
-    os.makedirs(user_dir, exist_ok=True)
-    
-    file_path = os.path.join(user_dir, file.filename)
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    
-    return {"message": "Файл загружен", "filename": file.filename}
 
 # --- ЧАТ ---
 class ChatMessage(BaseModel):
@@ -160,34 +115,7 @@ def send_chat_message(msg: ChatMessage, user: User = Depends(get_current_user), 
     db.commit()
     return {"status": "ok"}
 
-@app.get("/api/chat/history")
-def get_chat_history(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    messages = db.query(Message).filter(Message.user_id == user.id).order_by(Message.created_at).all()
-    return [{"text": m.text, "is_admin": m.is_from_admin} for m in messages]
-
-# --- АДМИНКА ---
-@app.get("/api/admin/chats")
-def get_all_chats(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    if not user.is_admin:
-        raise HTTPException(status_code=403, detail="Доступ запрещен")
-    users = db.query(User).filter(User.is_admin == False).all()
-    result = []
-    for u in users:
-        messages = db.query(Message).filter(Message.user_id == u.id).order_by(Message.created_at).all()
-        if messages:
-            result.append({"user_id": u.id, "email": u.email, "messages": [{"text": m.text, "is_admin": m.is_from_admin} for m in messages]})
-    return result
-
-@app.post("/api/admin/reply")
-def admin_reply(data: dict, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    if not user.is_admin:
-        raise HTTPException(status_code=403, detail="Доступ запрещен")
-    new_msg = Message(user_id=data.get("user_id"), text=data.get("text"), is_from_admin=True)
-    db.add(new_msg)
-    db.commit()
-    return {"status": "ok"}
-
-# --- РАЗДАЧА ФАЙЛОВ ---
+# --- ФАЙЛЫ ---
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
 
 @app.get("/")
@@ -198,9 +126,9 @@ def read_login(): return FileResponse(os.path.join(BASE_DIR, "static", "login.ht
 def read_register(): return FileResponse(os.path.join(BASE_DIR, "static", "register.html"))
 @app.get("/dashboard")
 def read_dashboard(): return FileResponse(os.path.join(BASE_DIR, "static", "dashboard.html"))
-@app.get("/admin")
-def read_admin(): return FileResponse(os.path.join(BASE_DIR, "static", "admin.html"))
 @app.get("/privacy")
 def read_privacy(): return FileResponse(os.path.join(BASE_DIR, "static", "privacy.html"))
 @app.get("/terms")
 def read_terms(): return FileResponse(os.path.join(BASE_DIR, "static", "terms.html"))
+@app.get("/offer")
+def read_offer(): return FileResponse(os.path.join(BASE_DIR, "static", "offer.html"))
