@@ -7,7 +7,6 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@studio-freight/lenis@1.0.33/dist/lenis.min.js"></script> 
     <style>
         body { font-family: 'Manrope', sans-serif; background-color: #050505; color: #ffffff; overflow-x: hidden; position: relative; }
         
@@ -19,10 +18,6 @@
         /* Стекло */
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); transition: border-color 0.3s, transform 0.3s; }
         .glass:hover { border-color: rgba(255, 255, 255, 0.2); }
-        
-        /* Анимации появления */
-        .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
-        .reveal.active { opacity: 1; transform: translateY(0); }
         
         /* Инпуты */
         .input-dark { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; transition: all 0.3s; }
@@ -41,7 +36,6 @@
         .btn-anim:active {
             transform: translateY(1px) scale(0.98);
         }
-        /* Волна при клике */
         .btn-anim::after {
             content: "";
             position: absolute;
@@ -95,7 +89,7 @@
     <!-- ГЛАВНАЯ -->
     <main id="section-landing" class="pt-20 relative z-10">
         <div class="pt-32 pb-24 px-6 overflow-hidden">
-            <div class="max-w-4xl mx-auto text-center reveal">
+            <div class="max-w-4xl mx-auto text-center">
                 <div class="inline-block px-4 py-1.5 rounded-full bg-white/5 text-gray-300 text-xs font-bold tracking-wide mb-8 border border-white/10">
                     ПРЕМИАЛЬНЫЙ АУДИТ БЕЗОПАСНОСТИ
                 </div>
@@ -117,9 +111,9 @@
     <!-- УСЛУГИ -->
     <section id="section-services" class="hidden pt-32 pb-24 px-6 relative z-10 min-h-screen">
         <div class="max-w-7xl mx-auto">
-            <h2 class="text-4xl font-extrabold text-center text-white mb-16 reveal">Тарифы и услуги</h2>
+            <h2 class="text-4xl font-extrabold text-center text-white mb-16">Тарифы и услуги</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="glass p-10 rounded-2xl flex flex-col reveal">
+                <div class="glass p-10 rounded-2xl flex flex-col">
                     <h3 class="text-2xl font-bold text-white mb-2">Экспресс</h3>
                     <p class="text-gray-400 mb-8">Быстрая проверка</p>
                     <div class="text-5xl font-extrabold text-white mb-8">5 000 ₽</div>
@@ -130,7 +124,7 @@
                     </ul>
                     <button onclick="startOrder('Экспресс', 5000)" class="btn-anim w-full bg-white hover:bg-gray-200 text-black py-4 rounded-lg font-bold">Заказать</button>
                 </div>
-                <div class="bg-white/10 backdrop-blur-xl p-10 rounded-2xl border-2 border-white/40 flex flex-col reveal delay-100 relative shadow-[0_0_50px_rgba(255,255,255,0.1)] transform md:-translate-y-4">
+                <div class="bg-white/10 backdrop-blur-xl p-10 rounded-2xl border-2 border-white/40 flex flex-col relative shadow-[0_0_50px_rgba(255,255,255,0.1)] transform md:-translate-y-4">
                     <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white text-black px-6 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase">Выбор клиентов</div>
                     <h3 class="text-2xl font-bold text-white mb-2">Полный аудит</h3>
                     <p class="text-gray-300 mb-8">Все уязвимости + исправление</p>
@@ -143,7 +137,7 @@
                     </ul>
                     <button onclick="startOrder('Полный аудит', 15000)" class="btn-anim w-full bg-white hover:bg-gray-200 text-black py-4 rounded-lg font-bold">Заказать</button>
                 </div>
-                <div class="glass p-10 rounded-2xl flex flex-col reveal delay-200">
+                <div class="glass p-10 rounded-2xl flex flex-col">
                     <h3 class="text-2xl font-bold text-white mb-2">Сопровождение</h3>
                     <p class="text-gray-400 mb-8">Защита каждый месяц</p>
                     <div class="text-5xl font-extrabold text-white mb-8">5 000 ₽<span class="text-xl text-gray-400 font-medium">/мес</span></div>
@@ -160,7 +154,7 @@
 
     <!-- АВТОРИЗАЦИЯ -->
     <section id="section-auth" class="hidden pt-40 pb-24 px-6 flex justify-center relative z-10 min-h-screen">
-        <div class="glass p-10 rounded-2xl max-w-md w-full h-fit reveal">
+        <div class="glass p-10 rounded-2xl max-w-md w-full h-fit">
             <h2 class="text-3xl font-extrabold text-white mb-8 text-center" id="auth-title">Вход в систему</h2>
             <form id="auth-form" class="space-y-6">
                 <div>
@@ -188,14 +182,14 @@
 
     <!-- КАБИНЕТ -->
     <section id="section-dashboard" class="hidden pt-32 pb-24 px-6 max-w-5xl mx-auto min-h-screen relative z-10">
-        <div class="flex justify-between items-end mb-10 border-b border-white/10 pb-6 reveal">
+        <div class="flex justify-between items-end mb-10 border-b border-white/10 pb-6">
             <div>
                 <h2 class="text-4xl font-extrabold text-white">Личный кабинет</h2>
                 <p class="text-gray-400 mt-2 font-medium">Управление вашими заказами</p>
             </div>
             <button onclick="showSection('services')" class="btn-anim bg-white hover:bg-gray-200 text-black px-6 py-3 rounded-lg text-sm font-bold">+ Новый заказ</button>
         </div>
-        <div id="orders-list" class="space-y-4 reveal delay-100"></div>
+        <div id="orders-list" class="space-y-4"></div>
     </section>
 
     <!-- МОДАЛЬНОЕ ОКНО ОПЛАТЫ -->
@@ -229,24 +223,6 @@
         }
         setInterval(createSnow, 100);
 
-        const lenis = new Lenis();
-        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
-        requestAnimationFrame(raf);
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) entry.target.classList.add('active');
-            });
-        }, { threshold: 0.1 });
-
-        function initReveal() {
-            document.querySelectorAll('.reveal').forEach(el => {
-                el.classList.remove('active');
-                observer.observe(el);
-            });
-        }
-        initReveal();
-
         let isRegisterMode = false;
         let currentOrderId = null;
 
@@ -265,8 +241,6 @@
             const sections = ['landing', 'services', 'auth', 'dashboard'];
             sections.forEach(id => document.getElementById(`section-${id}`).classList.add('hidden'));
             document.getElementById(`section-${sectionId}`).classList.remove('hidden');
-            setTimeout(initReveal, 50);
-            lenis.scrollTo(0, { immediate: true });
             
             const token = localStorage.getItem('token');
             if (token) {
@@ -311,7 +285,6 @@
                         switchAuthMode();
                     } else {
                         const data = await response.json();
-                        // Сохраняем токен в localStorage для запоминания
                         localStorage.setItem('token', data.access_token);
                         loadUserData(data.access_token);
                         showSection('dashboard');
