@@ -2,7 +2,6 @@ from fastapi import FastAPI, Depends, HTTPException, Request, UploadFile, File
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
@@ -11,30 +10,15 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 from database import SessionLocal, User, Message, Order
 
-# Для отправки почты
-import aiosmtplib
-from email.message import EmailMessage
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY", "fallback_secret_key")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 365 # 1 год
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 365  # Токен на 1 год
 
 app = FastAPI()
-
-# --- CORS ---
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"], 
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 os.makedirs(os.path.join(BASE_DIR, "static", "avatars"), exist_ok=True)
-os.makedirs(os.path.join(BASE_DIR, "static", "uploads"), exist_ok=True)
 
 def get_db():
     db = SessionLocal()
@@ -49,26 +33,16 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
         auth_header = request.headers.get("Authorization")
         if auth_header and auth_header.startswith("Bearer "):
             token = auth_header.split(" ")[1]
-    
     if not token:
         raise HTTPException(status_code=401, detail="Не авторизован")
-        
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email = payload.get("sub")
-        if email is None:
-            raise HTTPException(status_code=401, detail="Неверный токен")
     except JWTError:
         raise HTTPException(status_code=401, detail="Неверный токен")
-        
     user = db.query(User).filter(User.email == email).first()
     if user is None:
         raise HTTPException(status_code=401, detail="Пользователь не найден")
-    return user
-
-def get_admin_user(user: User = Depends(get_current_user)):
-    if not user.is_admin:
-        raise HTTPException(status_code=403, detail="Доступ запрещён. Вы не администратор.")
     return user
 
 def get_password_hash(password: str) -> str:
@@ -83,69 +57,20 @@ def create_access_token(data: dict):
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-# --- ОТПРАВКА ПОЧТЫ ---
-async def send_email_async(to_email: str, code: str):
-    message = EmailMessage()
-    message["From"] = os.getenv("SMTP_USER")
-    message["To"] = to_email
-    message["Subject"] = "Код подтверждения — CyberGuard"
-    message.set_content(f"Здравствуйте!\n\nВаш код подтверждения для входа в CyberGuard: {code}\n\nНикому не сообщайте этот код.")
-
-    await aiosmtplib.send(
-        message,
-        hostname=os.getenv("SMTP_SERVER"),
-        port=int(os.getenv("SMTP_PORT")),
-        username=os.getenv("SMTP_USER"),
-        password=os.getenv("SMTP_PASSWORD"),
-        use_tls=True,
-        timeout=15
-    )
-
-# --- АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ ---
-
 @app.post("/register")
-async def register(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def register(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     if db.query(User).filter(User.email == form_data.username).first():
-        raise HTTPException(status_code=400, detail="Email уже занят")
-    
-    code = str(random.randint(100000, 999999))
-    new_user = User(
-        email=form_data.username, 
-        hashed_password=get_password_hash(form_data.password), 
-        is_active=False, 
-        confirmation_token=code
-    )
+        raise HTTPException(status_code=400, detail="Email занят")
+    new_user = User(email=form_data.username, hashed_password=get_password_hash(form_data.password), is_active=True)
     db.add(new_user)
     db.commit()
-    
-    try:
-        await send_email_async(form_data.username, code)
-    except Exception as e:
-        print(f"ОШИБКА ОТПРАВКИ ПОЧТЫ: {e}")
-        raise HTTPException(status_code=500, detail="Не удалось отправить письмо. Проверьте настройки почты или попробуйте позже.")
-    
-    return {"message": "Код отправлен на почту"}
-
-@app.post("/api/verify_code")
-def verify_code(email: str, code: str, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == email).first()
-    if not user or user.confirmation_token != code:
-        raise HTTPException(status_code=400, detail="Неверный код подтверждения")
-    
-    user.is_active = True
-    user.confirmation_token = None
-    db.commit()
-    return {"status": "ok"}
+    return {"message": "OK"}
 
 @app.post("/token")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == form_data.username).first()
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Неверный логин или пароль")
-    
-    if not user.is_active:
-        raise HTTPException(status_code=403, detail="Почта не подтверждена. Пожалуйста, введите код из письма.")
-        
     return {"access_token": create_access_token(data={"sub": user.email}), "token_type": "bearer"}
 
 @app.get("/api/me")
@@ -153,15 +78,12 @@ def read_users_me(user: User = Depends(get_current_user)):
     return {"email": user.email, "is_admin": user.is_admin}
 
 # --- ЗАКАЗЫ ---
-
 class OrderCreate(BaseModel):
     title: str
     amount: int
 
 @app.post("/api/orders")
 def create_order(order: OrderCreate, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    if not order.title or order.amount <= 0:
-        raise HTTPException(status_code=400, detail="Некорректные данные")
     new_order = Order(user_id=user.id, title=order.title, amount=order.amount)
     db.add(new_order)
     db.commit()
@@ -178,6 +100,8 @@ def pay_order(order_id: int, user: User = Depends(get_current_user), db: Session
     order = db.query(Order).filter(Order.id == order_id, Order.user_id == user.id).first()
     if not order:
         raise HTTPException(status_code=404, detail="Заказ не найден")
+    order.status = "pending"
+    db.commit()
     return {"link": "https://yoomoney.ru/to/4100117382674034"}
 
 @app.post("/api/confirm_payment/{order_id}")
@@ -188,59 +112,7 @@ def confirm_payment(order_id: int, user: User = Depends(get_current_user), db: S
         db.commit()
     return {"status": "ok"}
 
-@app.post("/api/upload_file")
-def upload_file(file: UploadFile = File(...), user: User = Depends(get_current_user)):
-    file_path = os.path.join(BASE_DIR, "static", "uploads", f"{user.id}_{file.filename}")
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    return {"status": "ok", "filename": file.filename}
-
-# --- ЧАТ ---
-
-class ChatMessage(BaseModel):
-    text: str
-
-@app.post("/api/chat/send")
-def send_chat_message(msg: ChatMessage, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    new_msg = Message(user_id=user.id, text=msg.text, is_from_admin=False)
-    db.add(new_msg)
-    db.commit()
-    return {"status": "ok"}
-
-@app.get("/api/chat/history")
-def get_chat_history(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    msgs = db.query(Message).filter(Message.user_id == user.id).order_by(Message.created_at).all()
-    return [{"text": m.text, "is_admin": m.is_from_admin} for m in msgs]
-
-# --- АДМИН ЧАТ ---
-
-@app.get("/api/admin/chats")
-def get_admin_chats(admin: User = Depends(get_admin_user), db: Session = Depends(get_db)):
-    users = db.query(User).all()
-    result = []
-    for u in users:
-        msgs = db.query(Message).filter(Message.user_id == u.id).order_by(Message.created_at).all()
-        if msgs:
-            result.append({
-                "user_id": u.id,
-                "email": u.email,
-                "messages": [{"text": m.text, "is_admin": m.is_from_admin} for m in msgs]
-            })
-    return result
-
-class AdminReply(BaseModel):
-    user_id: int
-    text: str
-
-@app.post("/api/admin/reply")
-def admin_reply(reply: AdminReply, admin: User = Depends(get_admin_user), db: Session = Depends(get_db)):
-    new_msg = Message(user_id=reply.user_id, text=reply.text, is_from_admin=True)
-    db.add(new_msg)
-    db.commit()
-    return {"status": "ok"}
-
-# --- СТАТИКА И СТРАНИЦЫ ---
-
+# --- РАЗДАЧА ФАЙЛОВ ---
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
 
 @app.get("/")
@@ -259,5 +131,3 @@ def read_privacy(): return FileResponse(os.path.join(BASE_DIR, "static", "privac
 def read_terms(): return FileResponse(os.path.join(BASE_DIR, "static", "terms.html"))
 @app.get("/offer")
 def read_offer(): return FileResponse(os.path.join(BASE_DIR, "static", "offer.html"))
-@app.get("/verify")
-def read_verify(): return FileResponse(os.path.join(BASE_DIR, "static", "verify.html"))
